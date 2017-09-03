@@ -1,0 +1,281 @@
+const TKT = artifacts.require("TKT.sol");
+const CryptoTicketsICO = artifacts.require("CryptoTicketsICO.sol");
+
+
+
+contract('CryptoTicketsICO',function(accounts){
+  function randomInteger(min, max) {
+      var rand = min - 0.5 + Math.random() * (max - min + 1)
+      rand = Math.round(rand);
+      return rand;
+    };
+    var ContractAddress;
+
+    it("should set rate correctly", function(){
+        var random_int = randomInteger(1, 1000);
+        return CryptoTicketsICO.deployed().then(
+            function(instance) {
+             ContractAddress = instance;
+             return ContractAddress.setRate(random_int);
+          }).then(function(tx){
+             console.log(tx);
+             return ContractAddress.Rate_Eth.call();;
+          }).then(function(rate){
+            assert.equal(rate, random_int, "Rate_Eth isn't correct");
+          });
+
+    });
+
+
+    it("should start ICO", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.startIco();
+        }).then(function(tx) {
+            console.log(tx);
+            assert.isOk(tx.receipt);
+        });
+    });
+
+    it("should send tokens, when investor sends ether to contract", function(){
+
+       return CryptoTicketsICO.deployed().then(function(instance) {
+           ContractAddress = instance;
+           return ContractAddress.sendTransaction({
+                from: accounts[3],
+                value: 4000000000000000000});
+       }).then(function() {
+         return  ContractAddress.tkt.call();
+       }).then(function(token){
+            tkt = TKT.at(token);
+            return tkt.balanceOf.call(accounts[3]);
+         }).then(function(result){
+             console.log(result + " current balance of accounts[3]");
+             return tkt.totalSupply.call();
+         }).then(function(supply){
+           console.log(supply + " current totalSupply");
+         });
+
+    });
+
+    it("should buy tokens for investor who paid in other cryptos", function(){
+       var random_int = randomInteger(100000, 10000000);
+       return CryptoTicketsICO.deployed().then(function(instance) {
+           ContractAddress = instance;
+           return ContractAddress.buyForInvestor(accounts[2], random_int , "txH")
+       }).then(function(result) {
+         console.log(result);
+         return  ContractAddress.tkt.call()
+       }).then(function(token){
+            tkt = TKT.at(token);
+            return tkt.balanceOf.call(accounts[2]);
+         }).then(function(balance){
+             balance = JSON.parse(balance);
+             console.log(balance + " balance of accounts[2]");
+             assert.isAtLeast(balance, random_int, "tokens weren't sent" )
+             return tkt.totalSupply.call();
+         }).then(function(supply){
+           console.log(supply + " current totalSupply");
+         });
+
+    });
+
+    it("should get bonus correctly", function(){
+        var random_int = randomInteger(1, 10000000);
+        return CryptoTicketsICO.deployed().then(
+            function(instance) {
+             ContractAddress = instance;
+             return ContractAddress.getBonus(random_int);
+          }).then(function(result){
+             result = JSON.parse(result);
+             console.log(result + " result of getBonus");
+             var	bonus = Math.floor(random_int * 10 /100);
+             assert.equal(result, bonus, "Bonus isn't correct");
+          });
+
+    });
+
+    it("should withdraw ether", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.withdrawEther(web3.toWei(1, "ether"));
+        }).then(function(result) {
+            console.log(result.receipt);
+            assert.isOk(result.receipt);
+        }).then(function(){
+            return(web3.eth.getBalance(ContractAddress.address))
+        }).then(function(balance){
+            balance = JSON.parse(balance);
+            console.log(balance + " balance of our contract");
+            assert.equal(balance, 3000000000000000000, "doesn't withdraw ether right")
+        })
+    });
+
+    it("should pause ICO", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.pauseIco();
+        }).then(function(result) {
+            console.log(result.receipt);
+            assert.isOk(result.receipt);
+        });
+    });
+
+    it("should set rate correctly", function(){
+        var random_int = randomInteger(1, 1000);
+        return CryptoTicketsICO.deployed().then(
+            function(instance) {
+             ContractAddress = instance;
+             return instance.setRate(random_int);
+          }).then(function(tx){
+             console.log(tx);
+             var	Rate = ContractAddress.Rate_Eth.call();
+             return Rate;
+          }).then(function(result){
+            assert.equal(result, random_int, "Rate_Eth isn't correct");
+          });
+
+    });
+
+    it("should get bonus correctly", function(){
+        var random_int = randomInteger(1, 10000000);
+        return CryptoTicketsICO.deployed().then(
+            function(instance) {
+             ContractAddress = instance;
+             return ContractAddress.getBonus(random_int);
+          }).then(function(result){
+             result = JSON.parse(result);
+             console.log(result + " result of getBonus");
+             var	bonus = Math.floor(random_int * 10 /100);
+             assert.equal(result, bonus, "Bonus isn't correct");
+          });
+
+    });
+
+    it("should withdraw ether", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.withdrawEther(web3.toWei(1, "ether"));
+        }).then(function(result) {
+            console.log(result);
+            assert.isOk(result.receipt);
+        }).then(function(){
+            return(web3.eth.getBalance(ContractAddress.address))
+        }).then(function(balance){
+            balance = JSON.parse(balance);
+            console.log(balance + " balance of our contract");
+            assert.equal(balance, 2000000000000000000, "doesn't withdraw ether right")
+        })
+    });
+
+    it("should start ICO", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.startIco();
+        }).then(function(result) {
+            console.log(result.receipt);
+            assert.isOk(result.receipt);
+        });
+    });
+
+
+    it("should send tokens, when investor sends ether to contract", function(){
+
+       return CryptoTicketsICO.deployed().then(function(instance) {
+           ContractAddress = instance;
+           return ContractAddress.sendTransaction({
+                from: accounts[3],
+                value: 2000000000000000000});
+       }).then(function() {
+         return  ContractAddress.tkt.call();
+       }).then(function(token){
+            tkt = TKT.at(token);
+            return tkt.balanceOf.call(accounts[3]);
+         }).then(function(result){
+             console.log(result + " current balance of accounts[3]");
+             return tkt.totalSupply.call();
+         }).then(function(supply){
+           console.log(supply + " current totalSupply");
+         });
+
+    });
+
+    it("should buy tokens for investor who paid in other cryptos", function(){
+       var random_int = randomInteger(100000, 10000000);
+       return CryptoTicketsICO.deployed().then(function(instance) {
+           ContractAddress = instance;
+           return ContractAddress.buyForInvestor(accounts[1], random_int , "txH")
+       }).then(function(result) {
+         console.log(result);
+         return  ContractAddress.tkt.call()
+       }).then(function(token){
+            tkt = TKT.at(token);
+            return tkt.balanceOf.call(accounts[1]);
+         }).then(function(balance){
+             console.log(balance + " balance of accounts[1]");
+             balance = JSON.parse(balance);
+             assert.isAtLeast(balance, random_int, "tokens weren't sent" )
+             return tkt.totalSupply.call();
+         }).then(function(supply){
+           console.log(supply + " current totalSupply");
+         });
+
+    });
+
+    it("should get bonus correctly", function(){
+        var random_int = randomInteger(1, 10000000);
+        return CryptoTicketsICO.deployed().then(
+            function(instance) {
+             ContractAddress = instance;
+             return ContractAddress.getBonus(random_int);
+          }).then(function(result){
+             result = JSON.parse(result);
+             console.log(result + " result of getBonus");
+             var	bonus = Math.floor(random_int * 10 /100);
+             assert.equal(result, bonus, "Bonus isn't correct");
+          });
+
+    });
+
+    it("should withdraw ether", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.withdrawEther(web3.toWei(1, "ether"));
+        }).then(function(result) {
+            console.log(result);
+            assert.isOk(result.receipt);
+        }).then(function(){
+            return(web3.eth.getBalance(ContractAddress.address))
+        }).then(function(balance){
+            balance = JSON.parse(balance);
+            console.log(balance + " balance of our contract");
+            assert.equal(balance, 3000000000000000000, "doesn't withdraw ether right")
+        })
+    });
+
+    it("should finish ICO", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.finishIco();
+        }).then(function(result) {
+            console.log(result.receipt);
+            assert.isOk(result.receipt);
+        });
+    });
+
+    it("should withdraw ether", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.withdrawEther(web3.toWei(1, "ether"));
+        }).then(function(result) {
+            console.log(result);
+            assert.isOk(result.receipt);
+        }).then(function(){
+            return(web3.eth.getBalance(ContractAddress.address))
+        }).then(function(balance){
+            balance = JSON.parse(balance);
+            console.log(balance + " balance of our contract");
+            assert.equal(balance, 2000000000000000000, "doesn't withdraw ether right")
+        })
+    });
+});

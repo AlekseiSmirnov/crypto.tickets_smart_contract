@@ -61,9 +61,14 @@ contract ERC20 {
 
 contract CryptoTicketsICO {
     uint public constant Tokens_For_Sale = 525000000*1e18; // Tokens for Sale without bonuses(HardCap)
+
+    // Style: Caps should not be used for vars, only for consts!
     uint public Rate_Eth = 320; // Rate USD per ETH
     uint public Token_Price = 25 * Rate_Eth; // TKT per ETH
     uint public SoldNoBonuses = 0; //Sold tokens without bonuses
+
+    // 1 - this is never used???
+    // 2 - why 1e16 ???
     uint constant Token_Limit = 80392156863 * 1e16; //Total supply(HardCap)
 
     event StartICO();
@@ -166,11 +171,17 @@ contract CryptoTicketsICO {
     function buy(address _investor, uint _tktValue) internal {
        require(statusICO == StatusICO.Started);
        require(_tktValue > 0);
+
+       // Style: underscore in front is used for method params...
        uint _bonus = getBonus(_tktValue);
+
+       // Use SafeMath
        uint _total = _tktValue + _bonus;
 
        require(SoldNoBonuses + _tktValue <= Tokens_For_Sale);
        tkt.mint(_investor, _total);
+
+       // Use SafeMath
        SoldNoBonuses += _tktValue;
     }
 
@@ -194,6 +205,9 @@ contract CryptoTicketsICO {
 
 //function to withdraw ETH from smart contract
 
+    // SUGGESTION:
+    // allow anyone to call this in case 'ICO is finished'
+    // even if you loose you manager keys -> you still will be able to get ETH
     function withdrawEther(uint256 _value) external managerOnly {
        Company.transfer(_value);
     }

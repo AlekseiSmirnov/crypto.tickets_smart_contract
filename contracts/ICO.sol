@@ -37,11 +37,6 @@ library SafeMath {
     function min256(uint256 a, uint256 b) internal constant returns (uint256) {
         return a < b ? a : b;
     }
-    function assert(bool assertion) internal {
-        if (!assertion) {
-            throw;
-        }
-    }
 }
 
 
@@ -239,7 +234,10 @@ contract TKT  is ERC20 {
 
     function burn(uint256 _value) {
        require(!tokensAreFrozen);
-       require(balances[msg.sender]>_value);
+
+       // this check is not required, because 'sub' will throw 
+       //require(balances[msg.sender]>_value);
+
        balances[msg.sender] = balances[msg.sender].sub(_value);
        totalSupply = totalSupply.sub(_value);
        Burn(msg.sender, _value);
@@ -253,34 +251,30 @@ contract TKT  is ERC20 {
 
     function transfer(address _to, uint256 _amount) returns (bool) {
         require(!tokensAreFrozen);
-        if (balances[msg.sender] >= _amount && _amount > 0 && balances[_to] + _amount > balances[_to])
-        {
-            balances[msg.sender] = balances[msg.sender].sub(_amount);
-            balances[_to] = balances[_to].add(_amount);
-            Transfer(msg.sender, _to, _amount);
-            return true;
-        }
-        else
-        {
-              return false;
-        }
+
+        // this check is not required, because 'sub' will throw 
+        // see https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/BasicToken.sol
+        //if (balances[msg.sender] >= _amount && _amount > 0 && balances[_to] + _amount > balances[_to])
+
+        balances[msg.sender] = balances[msg.sender].sub(_amount);
+        balances[_to] = balances[_to].add(_amount);
+        Transfer(msg.sender, _to, _amount);
+        return true;
     }
 
 
     function transferFrom(address _from, address _to, uint256 _amount) returns (bool) {
         require(!tokensAreFrozen);
-        if (balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount && _amount > 0 && balances[_to] + _amount > balances[_to])
-        {
-            balances[_from] = balances[_from].sub(_amount);
-            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
-            balances[_to] = balances[_to].add(_amount);
-            Transfer(_from, _to, _amount);
-            return true;
-         }
-         else
-        {
-             return false;
-        }
+
+        // this check is not required, because 'sub' will throw 
+        // see https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/StandardToken.sol
+        //if (balances[_from] >= _amount && allowed[_from][msg.sender] >= _amount && _amount > 0 && balances[_to] + _amount > balances[_to])
+
+        balances[_from] = balances[_from].sub(_amount);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
+        balances[_to] = balances[_to].add(_amount);
+        Transfer(_from, _to, _amount);
+        return true;
      }
 
 

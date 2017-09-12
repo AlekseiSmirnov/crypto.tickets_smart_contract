@@ -1,8 +1,36 @@
 const TKT = artifacts.require("TKT.sol");
 const CryptoTicketsICO = artifacts.require("CryptoTicketsICO.sol");
+const Presale = artifacts.require("Presale.sol");
 
-
-
+contract('Presale',function(accounts){
+   var ContractAddress;
+      it("should mint tokens for investor", function(){
+         return Presale.deployed().then(function(instance){
+           ContractAddress = instance;
+           return ContractAddress.mintTokens(accounts[2], 867868)
+         }).then(function(){
+           return ContractAddress.balanceOf.call(accounts[2]);
+         }).then(function(balance){
+           console.log(balance);
+           assert.equal(balance, 867868, "Function doesn't work");
+         });
+       });
+       it("should set address of ICO", function(){
+          return Presale.deployed().then(function(instance){
+            ContractAddress = instance;
+            return CryptoTicketsICO.deployed();
+          }).then(function(instance){
+            return instance.address;
+          }).then(function(addressIco){
+            console.log(addressIco);
+            return ContractAddress.setIco(addressIco);
+          }).then(function(){
+            return ContractAddress.ico.call();
+          }).then(function(result){
+            console.log(result);
+          })
+        });
+});
 contract('CryptoTicketsICO',function(accounts){
   function randomInteger(min, max) {
       var rand = min - 0.5 + Math.random() * (max - min + 1)
@@ -89,7 +117,7 @@ contract('CryptoTicketsICO',function(accounts){
           }).then(function(result){
              result = JSON.parse(result);
              console.log(result + " result of getBonus");
-             var	bonus = Math.floor(random_int * 10 /100);
+             var	bonus = Math.floor(random_int * 20 /100);
              assert.equal(result, bonus, "Bonus isn't correct");
           });
 
@@ -146,7 +174,7 @@ contract('CryptoTicketsICO',function(accounts){
           }).then(function(result){
              result = JSON.parse(result);
              console.log(result + " result of getBonus");
-             var	bonus = Math.floor(random_int * 10 /100);
+             var	bonus = Math.floor(random_int * 20 /100);
              assert.equal(result, bonus, "Bonus isn't correct");
           });
 
@@ -214,12 +242,21 @@ contract('CryptoTicketsICO',function(accounts){
          }).then(function(balance){
              console.log(balance + " balance of accounts[1]");
              balance = JSON.parse(balance);
-             assert.isAtLeast(balance, random_int, "tokens weren't sent" )
+             assert.isAtLeast(balance, 867868, "tokens weren't sent" )
              return tkt.totalSupply.call();
          }).then(function(supply){
            console.log(supply + " current totalSupply");
          });
 
+    });
+
+    it("address of presale", function(){
+       return CryptoTicketsICO.deployed().then(function(instance) {
+           ContractAddress = instance;
+         return  ContractAddress.presale.call()
+       }).then(function(token){
+          console.log(token);
+         });
     });
 
     it("should get bonus correctly", function(){
@@ -231,7 +268,7 @@ contract('CryptoTicketsICO',function(accounts){
           }).then(function(result){
              result = JSON.parse(result);
              console.log(result + " result of getBonus");
-             var	bonus = Math.floor(random_int * 10 /100);
+             var	bonus = Math.floor(random_int * 20 /100);
              assert.equal(result, bonus, "Bonus isn't correct");
           });
 
@@ -252,6 +289,50 @@ contract('CryptoTicketsICO',function(accounts){
             assert.equal(balance, 3000000000000000000, "doesn't withdraw ether right")
         })
     });
+
+    it("should mint tokens for investor", function(){
+       return Presale.deployed().then(function(instance){
+         ContractAddress = instance;
+         return ContractAddress.mintTokens(accounts[2], 867868)
+       }).then(function(){
+         return ContractAddress.balanceOf.call(accounts[2]);
+       }).then(function(balance){
+         console.log(balance);
+         assert.equal(balance, 867868, "Function doesn't work");
+       });
+     });
+
+     it("should set address of ICO", function(){
+        return Presale.deployed().then(function(instance){
+          ContractAddress = instance;
+          return CryptoTicketsICO.deployed();
+        }).then(function(instance){
+          return instance.address;
+        }).then(function(addressIco){
+          console.log(addressIco);
+          return ContractAddress.setIco(addressIco);
+        }).then(function(){
+          return ContractAddress.ico.call();
+        }).then(function(result){
+          console.log(result);
+        })
+      });
+      
+     it("check balance of investor", function(){
+        return Presale.deployed().then(function(instance){
+          ContractAddress = instance;
+          return ContractAddress.balanceOf.call(accounts[2]);
+        }).then(function(balance){
+          console.log(balance);
+        }).then(function(){
+           return CryptoTicketsICO.deployed().then(function(instance) {
+            ContractAddress = instance;
+            return ContractAddress.replaceToken(accounts[2]);
+        });
+      });
+    });
+
+
 
     it("should finish ICO", function(){
        return CryptoTicketsICO.deployed().then(function(instance) {

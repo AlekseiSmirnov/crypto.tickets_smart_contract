@@ -1,8 +1,9 @@
 var Presale = artifacts.require("./Presale.sol");
 var ICO = artifacts.require("./CryptoTicketsICO.sol");
+var config = require('./config.json');
 
 module.exports = function(deployer) {
-  deployer.deploy(Presale, "0x1496a6f3e0c0364175633ff921e32a5d4aca5c45").then(function() {
-  return deployer.deploy(ICO, Presale.address);
+  deployer.deploy(Presale, config.ManagerForPresale).then(function() {
+  return deployer.deploy(ICO, Presale.address, config.Company, config.BountyFund, config.AdvisorsFund, config.ItdFund, config.StorageFund, config.Manager, config.Controller_Address1, config.Controller_Address2, config.Controller_Address3);
 });;
 };

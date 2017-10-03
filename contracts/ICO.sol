@@ -27,7 +27,7 @@ contract CryptoTicketsICO {
     uint public constant Tokens_For_Sale = 525000000*1e18; // Tokens for Sale without bonuses(HardCap)
 
     // Style: Caps should not be used for vars, only for consts!
-    uint public Rate_Eth = 320; // Rate USD per ETH
+    uint public Rate_Eth = 298; // Rate USD per ETH
     uint public Token_Price = 25 * Rate_Eth; // TKT per ETH
     uint public SoldNoBonuses = 0; //Sold tokens without bonuses
 
@@ -41,16 +41,16 @@ contract CryptoTicketsICO {
     TKT public tkt = new TKT(this);
     Presale public presale;
 
-    address public Company = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45;
-    address public BountyFund = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45;
-    address public AdvisorsFund = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45;
-    address public ItdFund = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45;
-    address public StorageFund = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45;
+    address public Company;
+    address public BountyFund;
+    address public AdvisorsFund;
+    address public ItdFund;
+    address public StorageFund;
 
-    address public Manager = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45; // Manager controls contract
-    address public Controller_Address1 = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45; // First address that is used to buy tokens for other cryptos
-    address public Controller_Address2 = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45; // Second address that is used to buy tokens for other cryptos
-    address public Controller_Address3 = 0x1496a6f3e0c0364175633ff921e32a5d4aca5c45; // Third address that is used to buy tokens for other cryptos
+    address public Manager; // Manager controls contract
+    address public Controller_Address1; // First address that is used to buy tokens for other cryptos
+    address public Controller_Address2; // Second address that is used to buy tokens for other cryptos
+    address public Controller_Address3; // Third address that is used to buy tokens for other cryptos
     modifier managerOnly { require(msg.sender == Manager); _; }
     modifier controllersOnly { require((msg.sender == Controller_Address1) || (msg.sender == Controller_Address2) || (msg.sender == Controller_Address3)); _; }
 
@@ -64,8 +64,17 @@ contract CryptoTicketsICO {
     StatusICO statusICO = StatusICO.Created;
 
 
-    function CryptoTicketsICO(address _presale){
+    function CryptoTicketsICO(address _presale, address _Company, address _BountyFund, address _AdvisorsFund, address _ItdFund, address _StorageFund, address _Manager, address _Controller_Address1, address _Controller_Address2, address _Controller_Address3){
        presale = Presale(_presale);
+       Company = _Company;
+       BountyFund = _BountyFund;
+       AdvisorsFund = _AdvisorsFund;
+       ItdFund = _ItdFund;
+       StorageFund = _StorageFund;
+       Manager = _Manager;
+       Controller_Address1 = _Controller_Address1;
+       Controller_Address2 = _Controller_Address2;
+       Controller_Address3 = _Controller_Address3;
     }
 
 // function for changing rate of ETH and price of token
@@ -135,9 +144,9 @@ contract CryptoTicketsICO {
          uint pctTokens = presale.balanceOf(_investor);
          require(pctTokens > 0);
          presale.burnTokens(_investor);
-         tkt.mint(_investor, 300);
+         tkt.mint(_investor, pctTokens);
 
-         LogReplaceToken(_investor, 300);
+         LogReplaceToken(_investor, pctTokens);
     }
 // internal function for buying tokens
 
@@ -183,7 +192,6 @@ contract CryptoTicketsICO {
 //function to withdraw ETH from smart contract
 
     // SUGGESTION:
-    // allow anyone to call this in case 'ICO is finished'
     // even if you lose you manager keys -> you still will be able to get ETH
     function withdrawEther(uint256 _value) external managerOnly {
        Company.transfer(_value);

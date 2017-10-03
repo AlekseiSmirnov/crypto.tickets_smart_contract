@@ -1,0 +1,13 @@
+{
+   "ManagerForPresale": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+   "Company": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+   "BountyFund": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+   "AdvisorsFund": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+   "ItdFund": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+   "StorageFund": "0xe647f19e13ebd3b5082a936248ae292aa6432d13",
+
+   "Manager": "0x685f5e8cdb05ce98295481a5dce72a42d4c452f9",
+   "Controller_Address1": "0x685f5e8cdb05ce98295481a5dce72a42d4c452f9",
+   "Controller_Address2": "0x685f5e8cdb05ce98295481a5dce72a42d4c452f9",
+   "Controller_Address3": "0x685f5e8cdb05ce98295481a5dce72a42d4c452f9"
+}

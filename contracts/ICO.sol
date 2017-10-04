@@ -194,6 +194,7 @@ contract CryptoTicketsICO {
     // SUGGESTION:
     // even if you lose you manager keys -> you still will be able to get ETH
     function withdrawEther(uint256 _value) external managerOnly {
+       require(statusICO == StatusICO.Finished);
        Company.transfer(_value);
     }
 
